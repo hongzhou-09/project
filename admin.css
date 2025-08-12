@@ -1,0 +1,126 @@
+/* Admin Panel 基础样式 */
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #f4f6f8;
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部导航栏 */
+.admin-header {
+  background-color: #2f3e46;
+  color: #fff;
+  padding: 12px 24px;
+  font-size: 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 侧边栏 */
+.admin-sidebar {
+  width: 220px;
+  background-color: #354f52;
+  color: #fff;
+  height: 100vh;
+  padding-top: 20px;
+  position: fixed;
+  top: 48px; /* 如果header固定高度48px */
+  left: 0;
+  overflow-y: auto;
+}
+
+.admin-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.admin-sidebar li {
+  padding: 12px 20px;
+  cursor: pointer;
+  border-left: 4px solid transparent;
+  transition: background-color 0.3s, border-left-color 0.3s;
+}
+
+.admin-sidebar li:hover,
+.admin-sidebar li.active {
+  background-color: #52796f;
+  border-left-color: #84a98c;
+}
+
+/* 主内容区域 */
+.admin-main {
+  margin-left: 220px;
+  padding: 24px;
+  flex: 1;
+  background: #fff;
+  min-height: calc(100vh - 48px);
+}
+
+/* 按钮 */
+.button {
+  background-color: #52796f;
+  color: #fff;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #354f52;
+}
+
+/* 表格 */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+.table th, .table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.table th {
+  background-color: #52796f;
+  color: white;
+}
+
+/* 表单输入 */
+.input {
+  padding: 8px 12px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #52796f;
+  box-shadow: 0 0 5px rgba(82, 121, 111, 0.5);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .admin-sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+  }
+  .admin-main {
+    margin-left: 0;
+  }
+}
