@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$database = "sneakerstore";
+$database = "elvra";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $database);
@@ -22,7 +22,7 @@ $expiry_year = $_POST['expiry_year'];
 $cvv = $_POST['cvv'];
 
 // Insert data into database
-$sql = "INSERT INTO payments (name, phone, address, card_number, expiry_month, expiry_year, cvv)
+$sql = "INSERT INTO payment (name, phone, address, card_number, expiry_month, expiry_year, cvv)
         VALUES ('$name', '$phone', '$address', '$card_number', '$expiry_month', '$expiry_year', '$cvv')";
 
 // Execute the query and check for success
