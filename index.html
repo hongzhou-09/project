@@ -167,7 +167,7 @@
       </button>
     </div>
 
-    <div class="right" style="gap:8px">
+    <div class="left" style="gap:8px">
       <div class="hamburger" id="menuBtn" title="CATEGORIES">
         <svg width="22" height="22" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></g></svg>
       </div>
@@ -274,7 +274,7 @@
     <div id="cartItems" style="flex:1; overflow:auto; padding-top:8px;"></div>
     <div style="border-top:1px solid #eee; padding-top:10px;">
       <div style="display:flex; justify-content:space-between; margin-bottom:10px">
-        <div>小计</div>
+        <div>TOTAL</div>
         <div id="cartSubtotal">RM 0.00</div>
       </div>
       <div style="display:flex; gap:8px">
@@ -346,10 +346,10 @@
       id: 'p1',
       name: 'Elvra t-shirt',
       category: 'tshirts',
-      price: 99,
+      price: 129,
       colors: [
-       { name: 'BLACK', code:'#000', image:'./img/Product/t-shirt.png', thumb:'./img/Product/t-shirt.png' },
-       { name: 'WHITE', code:'#FFFFFF', image:'./img/Product/t-shirt white.png', thumb:'./img/Product/t-shirt white.png' },
+       { name: 'PINK', code:'#F2B8C6', image:'./img/Product/shirt.png', thumb:'./img/Product/shirt.png' },
+       { name: 'GREY', code:'#808080', image:'./img/Product/shirt2.png', thumb:'./img/Product/shirt2.png' },
       ],
       sizes: ['S','M','L','XL'],
       featured: true
@@ -358,7 +358,7 @@
       id: 'p2',
       name: 'Elvra Heavy Hoodie',
       category: 'hoodies',
-      price: 149,
+      price: 129,
       colors: [
         { name: 'ARMY GREEN', code:'#55857C', image:'./img/Product/hoodies.png', thumb:'./img/Product/hoodies.png' },
         { name: 'WHITE', code:'#FFFFFF', image:'./img/Product/hoodies white.png', thumb:'./img/Product/hoodies white.png' },
@@ -368,9 +368,21 @@
     },
     {
       id: 'p3',
+      name: 'Elvra Jacket',
+      category: 'jackets',
+      price: 199,
+      colors: [
+        { name: 'GREY', code:'#808080', image:'./img/Product/jacket1.png', thumb:'./img/Product/jacket1.png' },
+        { name: 'RED', code:'#FF0000', image:'./img/Product/jacket4.png', thumb:'./img/Product/jacket4.png' }
+      ],
+      sizes: ['S', 'M', 'L'],
+      featured: true
+    },
+    {
+      id: 'p4',
       name: 'Elvra Pants',
       category: 'pants',
-      price: 199,
+      price: 79,
       colors: [
         { name: 'BLACK', code:'#000', image:'./img/Product/pants.png', thumb:'./img/Product/pants.png' },
         { name: 'WHITE', code:'#FFFFFF', image:'./img/Product/pants white.png', thumb:'./img/Product/pants white.png' }
@@ -379,7 +391,7 @@
       featured: true
     },
     {
-      id: 'p4',
+      id: 'p5',
       name: 'Elvra Cap',
       category: 'accessories',
       price: 49,
@@ -391,10 +403,10 @@
       featured: true
     },
     {
-      id: 'p5',
-      name: 'Elvra Shoe',
-      category: 'Shoes',
-      price: 129,
+      id: 'p6',
+      name: 'Elvra Shoes',
+      category: 'shoes',
+      price: 199,
       colors: [
         { name: 'WHITE', code:'#FFFFFF', image:'./img/Product/shoe.png', thumb:'./img/Product/shoe.png' },
         { name: 'WHITE', code:'#FFFFFF', image:'./img/Product/shoe1.png', thumb:'./img/Product/shoe1.png' }
@@ -402,12 +414,49 @@
       sizes: ['40', '41', '42', '43', '44'],
       featured: true
     },
+        {
+      id: 'p7',
+      name: 'Elvra Socks',
+      category: 'accessories',
+      price: 49,
+      colors: [
+        { name: 'GREY', code:'#808080', image:'./img/Product/socks.png', thumb:'./img/Product/socks.png' },
+        { name: 'BLACK', code:'#000', image:'./img/Product/socks2.png', thumb:'./img/Product/socks2.png' }
+      ],
+      sizes: ['S', 'M', 'L'],
+      featured: false
+    },
+        {
+      id: 'p8',
+      name: 'Elvra t-shirt',
+      category: 'tshirts',
+      price: 119,
+      colors: [
+       { name: 'COLOURFUL', code:'#FF6EC7', image:'./img/Product/shirt3.png', thumb:'./img/Product/shirt3.png' },
+       { name: 'GREEN', code:'#94FFD4', image:'./img/Product/shirt4.png', thumb:'./img/Product/shirt4.png' },
+      ],
+      sizes: ['S','M','L','XL'],
+      featured: true
+    },
+    {
+      id: 'p9',
+      name: 'Elvra t-shirt',
+      category: 'tshirts',
+      price: 99,
+      colors: [
+       { name: 'BLACK', code:'#000000', image:'./img/Product/t-shirt.png', thumb:'./img/Product/t-shirt.png' },
+       { name: 'WHITE', code:'#FFFFFF', image:'./img/Product/t-shirt white.png', thumb:'./img/Product/t-shirt white.png' },
+      ],
+      sizes: ['S','M','L','XL'],
+      featured: false
+    },
   ];
 
   // categories order
   const categories = [
     {id:'tshirts', title:'T-Shirts'},
     {id:'hoodies', title:'Hoodies'},
+    {id:'jackets', title:'Jackets'},
     {id:'pants', title:'Pants'},
     {id:'shoes', title:'Shoes'},
     {id:'accessories', title:'Accessories'}
@@ -424,7 +473,7 @@
       <h4>${p.name}</h4>
       <div class="meta">
         <div>RM ${p.price.toFixed(2)}</div>
-        <button data-id="${p.id}" class="openDetail" style="padding:6px 8px;border-radius:8px;border:1px solid #ddd; background:transparent; cursor:pointer">查看</button>
+        <button data-id="${p.id}" class="openDetail" style="padding:6px 8px;border-radius:8px;border:1px solid #ddd; background:transparent; cursor:pointer">see</button>
       </div>
     `;
     carouselTrack.appendChild(card);
@@ -460,7 +509,7 @@
         <h4>${p.name}</h4>
         <div class="meta">
           <div>RM ${p.price.toFixed(2)}</div>
-          <button data-id="${p.id}" class="openDetail" style="padding:6px 8px;border-radius:8px;border:1px solid #ddd; background:transparent; cursor:pointer">查看 / 购买</button>
+          <button data-id="${p.id}" class="openDetail" style="padding:6px 8px;border-radius:8px;border:1px solid #ddd; background:transparent; cursor:pointer">see / buy</button>
         </div>
       `;
       grid.appendChild(card);
@@ -608,7 +657,7 @@
     cartItemsEl.innerHTML = '';
     let subtotal = 0;
     if(cart.length===0){
-      cartItemsEl.innerHTML = '<div style="color:var(--muted); padding:8px">购物车空空如也</div>';
+      cartItemsEl.innerHTML = '<div style="color:var(--muted); padding:8px">Your cart is empty</div>';
     }else{
       cart.forEach((it, idx)=>{
         const p = products.find(x=>x.id===it.id);
@@ -740,7 +789,7 @@
     loginModal.setAttribute('aria-hidden','true');
   });
   document.getElementById('googleLogin').addEventListener('click', ()=> {
-    alert(' GOOGLE 登录 — IF NEED TO LOGIN PLEASE INTEGRATE GOOGLE OAuth。');
+    alert(' GOOGLE LOGIN — IF NEED TO LOGIN PLEASE INTEGRATE GOOGLE OAuth。');
     loginModal.classList.remove('show');
   });
   document.getElementById('phoneLoginBtn').addEventListener('click', ()=> {
