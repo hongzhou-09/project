@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Elvra - 潮牌服饰</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #e6f7ff; /* Light blue background */
+      --accent: #0b0b0b; /* Main color black */
+      --muted: #666;
+      --card: #ffffff;
+      --radius: 10px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:var(--bg);
+      color:var(--accent);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      scroll-behavior:smooth;
+    }
+
+    /* Header */
+    .header{
+      position:sticky; top:0; z-index:1000;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 18px;
+      background:rgba(255,255,255,0.7);
+      backdrop-filter: blur(6px);
+      border-bottom:1px solid rgba(11,11,11,0.06);
+    }
+    .left, .center, .right {display:flex; align-items:center; gap:12px;}
+    /* search */
+    .search-btn{display:flex; align-items:center; gap:8px; cursor:pointer;}
+    .search-input{display:none; border:1px solid #ddd; padding:6px 8px; border-radius:6px; width:200px;}
+    .search-input.visible{display:inline-block;}
+    /* cart */
+    .cart-btn{position:relative; cursor:pointer; background:transparent; border:none;}
+    .cart-count{
+      position:absolute; top:-6px; right:-6px; background:#000; color:#fff; font-size:12px;
+      width:20px; height:20px; display:flex; align-items:center; justify-content:center; border-radius:50%;
+    }
+    /* right group (hamburger + brand + avatar) */
+    .brand{font-weight:700; font-size:18px; cursor:pointer; margin-left:6px;}
+    .hamburger{width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer;}
+    .avatar{
+      width:36px; height:36px; border-radius:50%; display:inline-block; cursor:pointer;
+      border:2px solid #000; background:linear-gradient(135deg,#fff 0 50%, #000 50% 100%); /* 黑白头像风格 */
+      box-shadow:0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    /* side menu dropdown from right */
+    .menu-panel{
+      position:fixed; right:16px; top:64px; background:var(--card); border-radius:8px; padding:12px;
+      box-shadow:0 8px 30px rgba(0,0,0,0.12); display:none; z-index:1200;
+    }
+    .menu-panel.show{display:block}
+    .menu-panel a{display:block; padding:8px 12px; color:var(--accent); text-decoration:none; border-radius:6px;}
+    .menu-panel a:hover{background:#f4f8fb}
+
+    /* hero promo */
+    .hero{
+      max-width:1100px; margin:18px auto 6px; padding:12px;
+    }
+    .promo{
+      border-radius:12px; overflow:hidden; background:#000; color:#fff; display:flex; align-items:center;
+      min-height:260px; position:relative;
+    }
+    .promo img, .promo video{width:100%; height:100%; object-fit:cover; display:block;}
+    .promo-overlay{
+      position:absolute; left:18px; bottom:18px; color:#fff;
+      background:rgba(0,0,0,0.35); padding:10px 14px; border-radius:8px;
+    }
+
+    /* featured carousel */
+    .featured{max-width:1100px; margin:18px auto; padding:8px 12px;}
+    .carousel{
+      position:relative; overflow:hidden; border-radius:12px; background:transparent;
+    }
+    .carousel-track{
+      display:flex; gap:14px; transition:transform .45s cubic-bezier(.22,.9,.35,1);
+      padding:12px;
+    }
+    .card{
+      min-width:260px; background:var(--card); border-radius:10px; padding:10px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:8px;
+    }
+    .card img{width:100%; height:220px; object-fit:cover; border-radius:8px}
+    .card h4{margin:0;font-size:16px}
+    .card .meta{display:flex; justify-content:space-between; align-items:center; gap:8px}
+    .carousel-btn{
+      position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.9); border:none; width:40px; height:40px; border-radius:8px; cursor:pointer;
+      box-shadow:0 6px 18px rgba(0,0,0,0.08);
+    }
+    .carousel-btn.left{left:8px}
+    .carousel-btn.right{right:8px}
+
+    /* products by category (grid) */
+    .products-section{max-width:1100px; margin:14px auto; padding:12px; display:grid; gap:22px}
+    .category-title{display:flex; align-items:center; gap:12px}
+    .product-grid{display:grid; grid-template-columns: repeat(auto-fill,minmax(230px,1fr)); gap:16px}
+
+    /* product modal (详情) */
+    .modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:1400; padding:20px;}
+    .modal-backdrop.show{display:flex}
+    .product-modal{background:var(--card); border-radius:12px; max-width:980px; width:100%; display:flex; gap:12px; padding:16px; max-height:90vh; overflow:auto}
+    .pm-left{width:120px; display:flex; flex-direction:column; gap:8px; overflow:auto}
+    .pm-left img{width:100%; height:100px; object-fit:cover; border-radius:8px; cursor:pointer; border:2px solid transparent}
+    .pm-left img.active{border-color:#000}
+    .pm-main{flex:1; display:flex; gap:12px}
+    .pm-main img{width:420px; max-width:55%; height:auto; border-radius:10px; object-fit:cover}
+    .pm-info{flex:1; display:flex; flex-direction:column; gap:10px}
+    .sizes{display:flex; gap:8px; flex-wrap:wrap}
+    .size-btn, .color-btn{padding:8px 10px; border-radius:8px; border:1px solid #ddd; cursor:pointer; background:#fff}
+    .size-btn.active, .color-btn.active{border-color:#000; font-weight:600}
+    .color-btn{display:flex; align-items:center; gap:8px}
+    .color-swatch{width:26px; height:26px; border-radius:6px; border:1px solid #ccc}
+
+    .add-cart{padding:12px 14px; border-radius:10px; border:none; cursor:pointer; font-weight:600}
+    .add-cart.primary{background:#000; color:#fff}
+    .add-cart.ghost{background:transparent; border:1px solid #000}
+
+    /* cart drawer */
+    .cart-drawer{position:fixed; right:0; top:0; width:360px; height:100%; background:var(--card); box-shadow:-12px 0 30px rgba(0,0,0,0.12); transform:translateX(110%); transition:transform .36s; z-index:1600; padding:18px; display:flex; flex-direction:column; gap:12px;}
+    .cart-drawer.open{transform:translateX(0)}
+    .cart-item{display:flex; gap:10px; align-items:center}
+    .cart-item img{width:72px; height:72px; object-fit:cover; border-radius:8px}
+    .qty-controls{display:flex; gap:8px; align-items:center}
+
+    /* footer */
+    footer{max-width:1100px; margin:24px auto; padding:18px; color:var(--muted); display:flex; justify-content:space-between; gap:12px}
+    footer .socials{display:flex; gap:12px; align-items:center}
+
+    /* responsive */
+    @media (max-width:900px){
+      .pm-main img{max-width:45%}
+      .pm-left{display:none}
+      .carousel-track{padding:8px}
+      .carousel-btn{display:none}
+    }
+    @media (max-width:600px){
+      .search-input{width:120px}
+      .brand{display:none}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="left">
+      <div class="search-btn" id="searchToggle" title="SEARCH PRODUCTS">
+        <svg width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M21 21l-4.35-4.35M10.5 18A7.5 7.5 0 1 1 10.5 3a7.5 7.5 0 0 1 0 15z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        <input id="searchInput" class="search-input" placeholder="SEARCH PRODUCT NAME..." />
+      </div>
+    </div>
+
+    <div class="center">
+      <button class="cart-btn" id="openCart" aria-label="CART">
+        <svg width="26" height="26" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.4" d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1" /><circle cx="18" cy="20" r="1"/></svg>
+        <div class="cart-count" id="cartCount">0</div>
+      </button>
+    </div>
+
+    <div class="left" style="gap:8px">
+      <div class="hamburger" id="menuBtn" title="CATEGORIES">
+        <svg width="22" height="22" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></g></svg>
+      </div>
+      <div class="brand" id="brandBtn">Elvra</div>
+      <div class="avatar" id="avatarBtn" title="LOGIN"></div>
+    </div>
+
+    <!-- menu panel -->
+    <nav class="menu-panel" id="menuPanel" aria-hidden="true">
+      <strong>CATEGORIES</strong>
+      <a href="#tshirts" data-target="tshirts">T-Shirts</a>
+      <a href="#hoodies" data-target="hoodies">Hoodies</a>
+      <a href="#pants" data-target="pants">Pants</a>
+      <a href="#shoes" data-target="shoes">Shoes</a>
+      <a href="#accessories" data-target="accessories">Accessories</a>
+      <hr />
+      <a href="#products">ALL PRODUCT</a>
+    </nav>
+  </header>
+
+  <!-- Hero / Promo -->
+  <main>
+    <section class="hero">
+      <div class="promo">
+        <!-- 静态图片或 video -->
+        <img src="https://picsum.photos/seed/elvra-hero/1400/600" alt="Elvra " />
+        <div class="promo-overlay">
+          <div style="font-weight:700;font-size:18px">ELVRA — STREETWEAR</div>
+          <div style="font-size:13px; margin-top:6px">Made on demand · Designed locally · Shipping globally</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured carousel (轮番图) -->
+    <section class="featured" aria-label="FEATURED">
+      <h3 style="margin:0 0 8px 8px">FEATURED</h3>
+      <div class="carousel" id="featuredCarousel">
+        <button class="carousel-btn left" id="prevBtn">&#x2039;</button>
+        <div class="carousel-track" id="carouselTrack">
+          <!-- JS will render cards here -->
+        </div>
+        <button class="carousel-btn right" id="nextBtn">&#x203A;</button>
+      </div>
+    </section>
+
+    <!-- Products by category -->
+    <section id="products" class="products-section">
+      <!-- categories will be rendered here by JS -->
+    </section>
+  </main>
+
+  <!-- Product detail modal -->
+  <div class="modal-backdrop" id="productModalBackdrop" aria-hidden="true">
+    <div class="product-modal" role="dialog" aria-modal="true">
+      <div class="pm-left" id="pmLeft"></div>
+      <div class="pm-main">
+        <img id="pmMainImg" src="" alt="PRODUCT IMG">
+        <div class="pm-info">
+          <h2 id="pmTitle">Product</h2>
+          <div id="pmPrice" style="font-weight:700"></div>
+          <div>
+            <div style="font-size:13px;color:var(--muted)">Colour</div>
+            <div id="colorList" style="display:flex;gap:8px;margin-top:6px"></div>
+          </div>
+          <div>
+            <div style="font-size:13px;color:var(--muted)">Size</div>
+            <div class="sizes" id="sizeList"></div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:12px;">
+            <button class="add-cart primary" id="addToCartBtn">ADD TO CART</button>
+            <button class="add-cart ghost" id="buyNowBtn">BUY NOW!</button>
+          </div>
+          <div style="font-size:13px;color:var(--muted);margin-top:10px">You can select a color and click to switch the image. On the left is a column of images for enlarged viewing.</div>
+        </div>
+      </div>
+      <button style="position:absolute; right:10px; top:10px; background:transparent; border:none; font-size:22px; cursor:pointer" id="closeProductModal">&times;</button>
+    </div>
+  </div>
+
+  <!-- Login modal (模拟) -->
+  <div class="modal-backdrop" id="loginModal" aria-hidden="true">
+    <div style="background:#fff; padding:18px; border-radius:12px; max-width:420px; width:100%">
+      <h3 style="margin:0 0 8px">LOGIN / Sign in</h3>
+      <p style="color:var(--muted); margin:0 0 12px">PLEASE CHOOSE SIGN IN OPTION</p>
+      <div style="display:flex; gap:8px; margin-bottom:12px">
+        <button style="flex:1; padding:10px; border-radius:8px; border:1px solid #ddd; cursor:pointer" id="googleLogin">Use Google</button>
+        <button style="flex:1; padding:10px; border-radius:8px; border:1px solid #ddd; cursor:pointer" id="phoneLoginBtn">Phone Number</button>
+      </div>
+      <div id="phoneLoginForm" style="display:none">
+        <input id="phoneInput" placeholder="ENTER PHONE NUMBER" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ddd"/>
+        <div style="display:flex; gap:8px; margin-top:8px">
+          <button id="sendOtp" style="flex:1; padding:8px; border-radius:8px; border:1px solid #000; background:#000;color:#fff">SEND OTP</button>
+        </div>
+      </div>
+      <div style="margin-top:12px; display:flex; justify-content:flex-end; gap:8px">
+        <button id="closeLogin" style="padding:8px 10px; border-radius:8px; border:1px solid #ddd">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart drawer -->
+  <aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
+    <h3 style="margin:0"><CART/h3>
+    <div id="cartItems" style="flex:1; overflow:auto; padding-top:8px;"></div>
+    <div style="border-top:1px solid #eee; padding-top:10px;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:10px">
+        <div>TOTAL</div>
+        <div id="cartSubtotal">RM 0.00</div>
+      </div>
+      <div style="display:flex; gap:8px">
+        <button id="checkoutBtn" style="flex:1; padding:10px; border-radius:8px; border:none; background:#000; color:#fff">CHECKOUT</button>
+        <button id="clearCartBtn" style="padding:10px; border-radius:8px; border:1px solid #ddd">CLEAR</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- checkout modal (简单模拟) -->
+  <div class="modal-backdrop" id="checkoutModal" aria-hidden="true">
+    <div style="background:#fff; padding:18px; border-radius:12px; max-width:520px; width:100%;">
+      <h3>CHECKOUT</h3>
+       <form action="data.php" method="POST">
+                    <label>Name and Surname</label>
+                    <input type="text" name="name" placeholder="John Doe" class="payInput">
+                    <br>
+                    <label>Phone Number</label>
+                    <input type="text" name="phone" placeholder="+6012 345 6781" class="payInput" maxlength="13">
+                    <br>
+                    <label>Address</label>
+                    <input type="text" name="address" placeholder="Elton St 21 22-145" class="payInput">
+                    <br>
+                    <h1 class="payTitle">E-Wallet</h1>
+                    <div class="e-wallet">
+                        <img src="./img/Contact/tng.png" width="40" alt="" class="cardIcon">
+                        <img src="./img/Contact/duitnow.png" alt="" width="40" class="cardIcon">
+                    </div>
+                    <div class="e-wallet">
+                        <img src="./img/Contact/zhifubao.png" width="40" alt="" class="cardIcon">
+                        <img src="./img/Contact/weixin.png" alt="" width="40" class="cardIcon">
+                    </div>
+                    <h1 class="payTitle">Card Information</h1>
+                    <div class="cardIcons">
+                        <img src="./img/Contact/visa.png" width="40" alt="" class="cardIcon">
+                        <img src="./img/Contact/master.png" alt="" width="40" class="cardIcon">
+                        <img src="./img/Contact/unionpay.png" alt="" width="45"  alt="" height="35" class="cardIcon">
+                    </div>
+                    <input type="text" name="card_number" class="payInput" placeholder="Card Number" maxlength="16">
+                    <div class="cardInfo">
+                        <input type="text" name ="expiry_month" placeholder="mm" class="payInput sm" maxlength="2">
+                        <input type="text" name ="expiry_year" placeholder="yyyy" class="payInput sm" maxlength="4">
+                        <input type="text" name ="cvv" placeholder="cvv" class="payInput sm">
+                    </div>
+                    
+                    <button type="submit" class="payButton">Checkout!</button>
+                    <span class="close">X</span>
+                </form>
+            </div>
+        </div>
+  <!-- Footer -->
+  <footer>
+    <div>
+      <div style="font-weight:700">Elvra</div>
+      <div style="margin-top:6px; font-size:13px">Streetwear · Locally Designed · Shipped Worldwide</div>
+    </div>
+<!-- 额外 Footer 信息 -->
+<div style="margin-top:20px; text-align:center; font-family: Arial, sans-serif;">
+  <!-- 社交图标 -->
+  <a href="https://www.instagram.com/" target="_blank" style="margin:0 10px;">
+    <img src="./img/Contact/instagram.png" alt="Instagram" style="width:30px; vertical-align:middle;">
+  </a>
+  <a href="tel:+60 12-345678" style="margin:0 10px;">
+    <img src="./img/Contact/whatsapp.png" alt="Phone" style="width:30px; vertical-align:middle;">
+  </a>
+  <a href="https://www.facebook.com/\" target="_blank" style="margin:0 10px;">
+    <img src="./img/Contact/facebook.png" alt="Facebook" style="width:30px; vertical-align:middle;">
+  </a>
+
+  <!-- Feedback 输入框 -->
+  <div style="margin-top:15px;">
+    <input type="text" placeholder="WRITE DOWN YOUR FEEDBACK..." style="padding:8px; width:250px; border:1px solid #ccc; border-radius:4px;">
+    <button style="padding:8px 12px; background-color:#333; color:white; border:none; border-radius:4px; cursor:pointer;">
+      SENT！
+    </button>
+  </div>
+</div>
+
+    </footer>
+
+<script>
+  // ====== 产品数据（示例） ======
+  const products = [
+    {
+      id: 'p1',
+      name: 'Elvra t-shirt',
+      category: 'tshirts',
+      price: 129,
+      colors: [
+       { name: 'PINK', code:'#F2B8C6', image:'./img/Product/shirt2.png', thumb:'./img/Product/shirt2.png' },
+       { name: 'GREY', code:'#808080', image:'./img/Product/shirt1.png', thumb:'./img/Product/shirt1.png' },
+      ],
+      sizes: ['S','M','L','XL'],
+      featured: true
+    },
+    {
+      id: 'p2',
+      name: 'Elvra Heavy Hoodie',
+      category: 'hoodies',
+      price: 129,
+      colors: [
+        { name: 'ARMY GREEN', code:'#55857C', image:'./img/Product/hoodies.png', thumb:'./img/Product/hoodies.png' },
+        { name: 'WHITE', code:'#FFFFFF', image:'./img/Product/hoodies2.png', thumb:'./img/Product/hoodies2.png' },
+      ],
+      sizes: ['S','M','L','XL'],
+      featured: true
+    },
+    {
+      id: 'p3',
+      name: 'Elvra Jacket',
+      category: 'jackets',
+      price: 199,
+      colors: [
+        { name: 'GREY', code:'#808080', image:'./img/Product/jacket.png', thumb:'./img/Product/jacket.png' },
+      ],
+      sizes: ['S', 'M', 'L'],
+      featured: true
+    },
+    {
+      id: 'p4',
+      name: 'Elvra Pants',
+      category: 'pants',
+      price: 79,
+      colors: [
+        { name: 'BEIGE', code:'#faebd7', image:'./img/Product/pants3.png', thumb:'./img/Product/pants3.png' },
+        { name: 'PINK', code:'#FDAB9F', image:'./img/Product/pants4.png', thumb:'./img/Product/pants4.png' }
+      ],
+      sizes: ['S','M','L'],
+      featured: true
+    },
+    {
+      id: 'p5',
+      name: 'Elvra Cap',
+      category: 'accessories',
+      price: 49,
+      colors: [
+        { name: 'KHAKI', code:'#b3aa70', image:'./img/Product/hat.png', thumb:'./img/Product/hat.png' },
+        { name: 'BLUE', code:'#030c42', image:'./img/Product/hat2.png', thumb:'./img/Product/hat2.png' }
+      ],
+      sizes: ['FREE SIZE'],
+      featured: true
+    },
+    {
+      id: 'p6',
+      name: 'Elvra Shoes',
+      category: 'shoes',
+      price: 199,
+      colors: [
+        { name: 'WHITE', code:'#FFFFFF', image:'./img/Product/shoes.png', thumb:'./img/Product/shoes.png' },
+        { name: 'WHITE', code:'#FFFFFF', image:'./img/Product/shoes1.png', thumb:'./img/Product/shoes1.png' }
+      ],
+      sizes: ['40', '41', '42', '43', '44'],
+      featured: true
+    },
+        {
+      id: 'p7',
+      name: 'Elvra Socks',
+      category: 'accessories',
+      price: 49,
+      colors: [
+        { name: 'BLACK', code:'#000000', image:'./img/Product/socks3.png', thumb:'./img/Product/socks3.png' },
+        { name: 'GREY', code:'#808080', image:'./img/Product/socks2.png', thumb:'./img/Product/socks2.png' },
+        { name: 'WHITE', code:'#FFFFFF', image:'./img/Product/socks.png', thumb:'./img/Product/socks.png' }
+      ],
+      sizes: ['S', 'M', 'L'],
+      featured: false
+    },
+        {
+      id: 'p8',
+      name: 'Elvra t-shirt',
+      category: 'tshirts',
+      price: 119,
+      colors: [
+       { name: 'COLOURFUL', code:'#FF6EC7', image:'./img/Product/shirt4.png', thumb:'./img/Product/shirt4.png' },
+       { name: 'GREEN', code:'#94FFD4', image:'./img/Product/shirt3.png', thumb:'./img/Product/shirt3.png' },
+      ],
+      sizes: ['S','M','L','XL'],
+      featured: false
+    },
+    {
+      id: 'p9',
+      name: 'Elvra t-shirt',
+      category: 'tshirts',
+      price: 99,
+      colors: [
+       { name: 'BLACK', code:'#000000', image:'./img/Product/t-shirt.png', thumb:'./img/Product/t-shirt.png' },
+       { name: 'WHITE', code:'#FFFFFF', image:'./img/Product/t-shirt2.png', thumb:'./img/Product/t-shirt2.png' },
+      ],
+      sizes: ['S','M','L','XL'],
+      featured: false
+    },
+        {
+      id: 'p10',
+      name: 'Elvra Heavy Hoodie',
+      category: 'hoodies',
+      price: 129,
+      colors: [
+        { name: 'DARK BLUE', code:'#00008B', image:'./img/Product/hoodies3.png', thumb:'./img/Product/hoodies3.png' },
+        { name: 'RED', code:'#FF0000', image:'./img/Product/hoodies4.png', thumb:'./img/Product/hoodies4.png' },
+      ],
+      sizes: ['S','M','L','XL'],
+      featured: false
+    },
+        {
+      id: 'p4',
+      name: 'Elvra Pants',
+      category: 'pants',
+      price: 79,
+      colors: [
+        { name: 'BLACK', code:'#000', image:'./img/Product/pants.png', thumb:'./img/Product/pants.png' },
+        { name: 'WHITE', code:'#FFFFFF', image:'./img/Product/pants2.png', thumb:'./img/Product/pants2.png' }
+      ],
+      sizes: ['S','M','L'],
+      featured: true
+    },
+  ];
+
+  // categories order
+  const categories = [
+    {id:'tshirts', title:'T-Shirts'},
+    {id:'hoodies', title:'Hoodies'},
+    {id:'jackets', title:'Jackets'},
+    {id:'pants', title:'Pants'},
+    {id:'shoes', title:'Shoes'},
+    {id:'accessories', title:'Accessories'}
+  ];
+
+  // ====== 渲染功能 ======
+  const carouselTrack = document.getElementById('carouselTrack');
+  const featured = products.filter(p=>p.featured);
+  featured.forEach(p=>{
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <img src="${p.colors[0].thumb}" alt="${p.name}" data-id="${p.id}">
+      <h4>${p.name}</h4>
+      <div class="meta">
+        <div>RM ${p.price.toFixed(2)}</div>
+        <button data-id="${p.id}" class="openDetail" style="padding:6px 8px;border-radius:8px;border:1px solid #ddd; background:transparent; cursor:pointer">see</button>
+      </div>
+    `;
+    carouselTrack.appendChild(card);
+  });
+
+  // carousel controls
+  let pos = 0;
+  const cardWidth = 280; // approx including gap
+  document.getElementById('prevBtn').addEventListener('click', ()=> {
+    pos = Math.min(pos + cardWidth*2, 0);
+    carouselTrack.style.transform = `translateX(${pos}px)`;
+  });
+  document.getElementById('nextBtn').addEventListener('click', ()=> {
+    const max = -Math.max(0, (carouselTrack.childElementCount * (cardWidth) - (document.querySelector('.carousel').clientWidth - 40)));
+    pos = Math.max(pos - cardWidth*2, max);
+    carouselTrack.style.transform = `translateX(${pos}px)`;
+  });
+
+  // render categories and product grids
+  const productsSection = document.getElementById('products');
+  categories.forEach(cat=>{
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = `<div class="category-title"><h2 id="${cat.id}" style="margin:0">${cat.title}</h2></div>`;
+    const grid = document.createElement('div');
+    grid.className = 'product-grid';
+    products.filter(p=>p.category===cat.id).forEach(p=>{
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.name = p.name.toLowerCase();
+      card.dataset.category = p.category;
+      card.innerHTML = `
+        <img src="${p.colors[0].thumb}" alt="${p.name}" data-id="${p.id}">
+        <h4>${p.name}</h4>
+        <div class="meta">
+          <div>RM ${p.price.toFixed(2)}</div>
+          <button data-id="${p.id}" class="openDetail" style="padding:6px 8px;border-radius:8px;border:1px solid #ddd; background:transparent; cursor:pointer">see / buy</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+    wrapper.appendChild(grid);
+    productsSection.appendChild(wrapper);
+  });
+
+  // ====== 菜单、搜索、品牌跳回顶部 ======
+  const menuBtn = document.getElementById('menuBtn');
+  const menuPanel = document.getElementById('menuPanel');
+  menuBtn.addEventListener('click', ()=> menuPanel.classList.toggle('show'));
+  // 点击菜单项关闭并滚动到对应分类
+  menuPanel.querySelectorAll('a[data-target]').forEach(a=>{
+    a.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const id = a.dataset.target;
+      menuPanel.classList.remove('show');
+      document.getElementById(id).scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+
+  // brand -> 回到顶部
+  document.getElementById('brandBtn').addEventListener('click', ()=> window.scrollTo({top:0, behavior:'smooth'}));
+
+  // 搜索
+  const searchToggle = document.getElementById('searchToggle');
+  const searchInput = document.getElementById('searchInput');
+  searchToggle.addEventListener('click', ()=> {
+    searchInput.classList.toggle('visible');
+    if(searchInput.classList.contains('visible')) searchInput.focus();
+    else searchInput.value='';
+  });
+  searchInput.addEventListener('input', ()=> {
+    const q = searchInput.value.trim().toLowerCase();
+    document.querySelectorAll('.product-grid .card').forEach(card=>{
+      const name = card.dataset.name || '';
+      card.style.display = name.includes(q) ? 'block' : 'none';
+    });
+  });
+
+  // open product detail (delegation)
+  document.body.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.openDetail');
+    if(btn){
+      const id = btn.dataset.id;
+      openProductModal(id);
+    }
+  });
+
+  // ====== Product Modal logic ======
+  const productModalBackdrop = document.getElementById('productModalBackdrop');
+  const pmLeft = document.getElementById('pmLeft');
+  const pmMainImg = document.getElementById('pmMainImg');
+  const pmTitle = document.getElementById('pmTitle');
+  const pmPrice = document.getElementById('pmPrice');
+  const colorList = document.getElementById('colorList');
+  const sizeList = document.getElementById('sizeList');
+  let currentProduct = null;
+  let currentColorIndex = 0;
+  let currentSize = null;
+
+  function openProductModal(id){
+    const p = products.find(x=>x.id===id);
+    if(!p) return;
+    currentProduct = p;
+    currentColorIndex = 0;
+    currentSize = p.sizes[0] || null;
+    // left thumbnails
+    pmLeft.innerHTML = '';
+    p.colors.forEach((c,idx)=>{
+      const img = document.createElement('img');
+      img.src = c.thumb;
+      img.dataset.idx = idx;
+      if(idx===0) img.classList.add('active');
+      img.addEventListener('click', ()=> {
+        selectColor(idx);
+      });
+      pmLeft.appendChild(img);
+    });
+    // main
+    pmMainImg.src = p.colors[0].image;
+    pmTitle.textContent = p.name;
+    pmPrice.textContent = `RM ${p.price.toFixed(2)}`;
+    // colors buttons
+    colorList.innerHTML = '';
+    p.colors.forEach((c,idx)=>{
+      const b = document.createElement('button');
+      b.className = 'color-btn' + (idx===0 ? ' active' : '');
+      b.innerHTML = `<div class="color-swatch" style="background:${c.code}"></div><div style="font-size:13px">${c.name}</div>`;
+      b.addEventListener('click', ()=>selectColor(idx));
+      colorList.appendChild(b);
+    });
+    // sizes
+    sizeList.innerHTML = '';
+    p.sizes.forEach(s=>{
+      const sb = document.createElement('button');
+      sb.className = 'size-btn' + (s===currentSize ? ' active' : '');
+      sb.textContent = s;
+      sb.addEventListener('click', ()=> {
+        currentSize = s;
+        sizeList.querySelectorAll('.size-btn').forEach(x=>x.classList.remove('active'));
+        sb.classList.add('active');
+      });
+      sizeList.appendChild(sb);
+    });
+
+    productModalBackdrop.classList.add('show');
+    productModalBackdrop.setAttribute('aria-hidden','false');
+  }
+
+  function selectColor(idx){
+    currentColorIndex = idx;
+    const color = currentProduct.colors[idx];
+    pmMainImg.src = color.image;
+    pmLeft.querySelectorAll('img').forEach(i=>i.classList.toggle('active', i.dataset.idx==idx));
+    colorList.querySelectorAll('.color-btn').forEach((b,bi)=>b.classList.toggle('active', bi===idx));
+  }
+
+  document.getElementById('closeProductModal').addEventListener('click', ()=> {
+    productModalBackdrop.classList.remove('show');
+    productModalBackdrop.setAttribute('aria-hidden','true');
+  });
+  productModalBackdrop.addEventListener('click', (e)=>{
+    if(e.target === productModalBackdrop){
+      productModalBackdrop.classList.remove('show');
+      productModalBackdrop.setAttribute('aria-hidden','true');
+    }
+  });
+
+  // ====== Cart (localStorage 简易) ======
+  const cartKey = 'elvra_cart_v1';
+  let cart = JSON.parse(localStorage.getItem(cartKey) || '[]');
+  const cartCountEl = document.getElementById('cartCount');
+  const cartDrawer = document.getElementById('cartDrawer');
+  const cartItemsEl = document.getElementById('cartItems');
+  const cartSubtotalEl = document.getElementById('cartSubtotal');
+
+  function saveCart(){
+    localStorage.setItem(cartKey, JSON.stringify(cart));
+    renderCart();
+  }
+  function renderCart(){
+    cartCountEl.textContent = cart.reduce((s,it)=>s+it.qty,0);
+    cartItemsEl.innerHTML = '';
+    let subtotal = 0;
+    if(cart.length===0){
+      cartItemsEl.innerHTML = '<div style="color:var(--muted); padding:8px">Your cart is empty</div>';
+    }else{
+      cart.forEach((it, idx)=>{
+        const p = products.find(x=>x.id===it.id);
+        subtotal += p.price * it.qty;
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <img src="${p.colors[it.colorIdx].thumb}" />
+          <div style="flex:1">
+            <div style="font-weight:600">${p.name}</div>
+            <div style="font-size:13px; color:var(--muted)">${p.colors[it.colorIdx].name} · ${it.size || ''}</div>
+            <div style="margin-top:8px; display:flex; gap:8px; align-items:center">
+              <div class="qty-controls">
+                <button data-idx="${idx}" class="decQty">-</button>
+                <span style="padding:4px 8px">${it.qty}</span>
+                <button data-idx="${idx}" class="incQty">+</button>
+              </div>
+              <div style="margin-left:10px; font-weight:700">RM ${(p.price * it.qty).toFixed(2)}</div>
+            </div>
+          </div>
+          <button data-idx="${idx}" class="removeItem" style="background:transparent;border:none;cursor:pointer">✕</button>
+        `;
+        cartItemsEl.appendChild(div);
+      });
+    }
+    cartSubtotalEl.textContent = `RM ${subtotal.toFixed(2)}`;
+  }
+
+  // change qty, remove
+  cartItemsEl.addEventListener('click', (e)=>{
+    if(e.target.matches('.incQty')){
+      const i = +e.target.dataset.idx;
+      cart[i].qty++;
+      saveCart();
+    } else if(e.target.matches('.decQty')){
+      const i = +e.target.dataset.idx;
+      cart[i].qty = Math.max(1, cart[i].qty-1);
+      saveCart();
+    } else if(e.target.matches('.removeItem')){
+      const i = +e.target.dataset.idx;
+      cart.splice(i,1);
+      saveCart();
+    }
+  });
+
+  // add to cart btn
+  document.getElementById('addToCartBtn').addEventListener('click', ()=>{
+    if(!currentProduct) return;
+    const item = {
+      id: currentProduct.id,
+      colorIdx: currentColorIndex,
+      size: currentSize,
+      qty: 1
+    };
+    // 合并相同商品（相同id+color+size）
+    const sameIdx = cart.findIndex(c=>c.id===item.id && c.colorIdx===item.colorIdx && c.size===item.size);
+    if(sameIdx>=0) cart[sameIdx].qty += 1;
+    else cart.push(item);
+    saveCart();
+    alert('ADD TO CART');
+  });
+
+  // buy now -> 直接打开结账并预填购物信息 (把当前单件作为购买项)
+  document.getElementById('buyNowBtn').addEventListener('click', ()=>{
+    if(!currentProduct) return;
+    // 临时将只买这件放到 cartTemp 并打开 checkout
+    const tmp = [{id: currentProduct.id, colorIdx: currentColorIndex, size: currentSize, qty:1}];
+    // 保存到 localStorage 临时键并跳到结账模拟
+    localStorage.setItem('elvra_cart_temp', JSON.stringify(tmp));
+    openCheckoutModal(true);
+  });
+
+  // open cart drawer
+  document.getElementById('openCart').addEventListener('click', ()=> {
+    cartDrawer.classList.toggle('open');
+    renderCart();
+  });
+
+  // clear cart
+  document.getElementById('clearCartBtn').addEventListener('click', ()=>{
+    if(confirm('Are you sure you want to empty your shopping cart?')){ cart = []; saveCart(); }
+  });
+
+  // checkout from drawer
+  document.getElementById('checkoutBtn').addEventListener('click', ()=> openCheckoutModal(false));
+
+  // initialize cart on load
+  renderCart();
+
+  // ====== Checkout modal ======
+  const checkoutModal = document.getElementById('checkoutModal');
+  const checkoutName = document.getElementById('checkoutName');
+  const checkoutPhone = document.getElementById('checkoutPhone');
+  const checkoutAddress = document.getElementById('checkoutAddress');
+
+  function openCheckoutModal(fromBuyNow){
+    checkoutModal.classList.add('show');
+    checkoutModal.setAttribute('aria-hidden','false');
+    // 如果 buy now, 先把临时项搬到页面并提示
+    if(fromBuyNow){
+      // 直接提示用户输入资料（模拟支付）
+    }
+  }
+  document.getElementById('cancelCheckout').addEventListener('click', ()=> {
+    checkoutModal.classList.remove('show');
+    checkoutModal.setAttribute('aria-hidden','true');
+  });
+  document.getElementById('confirmCheckout').addEventListener('click', ()=>{
+    // 简单模拟支付确认
+    const nm = checkoutName.value.trim() || 'CUSTOMER';
+    alert(`THANKS ${nm}！PAYMENT SUCCESSFUL 。We will contact you to arrange delivery。`);
+    // 清空购物车与临时
+    cart = [];
+    saveCart();
+    localStorage.removeItem('elvra_cart_temp');
+    checkoutModal.classList.remove('show');
+    checkoutModal.setAttribute('aria-hidden','true');
+    cartDrawer.classList.remove('open');
+  });
+
+  // ====== Login modal (模拟) ======
+  const loginModal = document.getElementById('loginModal');
+  document.getElementById('avatarBtn').addEventListener('click', ()=> {
+    loginModal.classList.add('show');
+    loginModal.setAttribute('aria-hidden','false');
+  });
+  document.getElementById('closeLogin').addEventListener('click', ()=> {
+    loginModal.classList.remove('show');
+    loginModal.setAttribute('aria-hidden','true');
+  });
+  document.getElementById('googleLogin').addEventListener('click', ()=> {
+    alert(' GOOGLE LOGIN — IF NEED TO LOGIN PLEASE INTEGRATE GOOGLE OAuth。');
+    loginModal.classList.remove('show');
+  });
+  document.getElementById('phoneLoginBtn').addEventListener('click', ()=> {
+    document.getElementById('phoneLoginForm').style.display = 'block';
+  });
+  document.getElementById('sendOtp').addEventListener('click', ()=> {
+    alert('SENT OTP — PLEASE ENTER TO LOGIN (SIMULATION).');
+  });
+
+  // close login when backdrop clicked
+  loginModal.addEventListener('click', (e)=> { if(e.target === loginModal){ loginModal.classList.remove('show'); } });
+
+  // ====== small interactions ======
+  document.addEventListener('keydown', (e)=> {
+    if(e.key === 'Escape'){
+      productModalBackdrop.classList.remove('show');
+      loginModal.classList.remove('show');
+      checkoutModal.classList.remove('show');
+      cartDrawer.classList.remove('open');
+    }
+  });
+
+  // Some niceties: clicking product image opens modal too
+  document.addEventListener('click', (e)=>{
+    const img = e.target.closest('img[data-id]');
+    if(img){
+      openProductModal(img.dataset.id);
+    }
+  });
+
+  // load saved cart from storage on start
+  (function init(){
+    const saved = JSON.parse(localStorage.getItem(cartKey) || '[]');
+    if(Array.isArray(saved)) cart = saved;
+    renderCart();
+  })();
+
+</script>
+
+</body>
+</html>
